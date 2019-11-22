@@ -22,7 +22,8 @@ new action, then pass it to the action */
 /*export let fetchPosts = (dispatch, getState) => {
   return async function() {
     refactor:*/
+//(176)в response получаем слишком много данных, поэтому сократим только до data
 export let fetchPosts = () => async dispatch => {
   let response = await jsonPlaceHolder.get("/posts");
-  dispatch({ type: "FETCH_POSTS", payload: response });
+  dispatch({ type: "FETCH_POSTS", payload: response.data });
 };

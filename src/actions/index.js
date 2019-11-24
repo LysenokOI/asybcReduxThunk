@@ -27,3 +27,8 @@ export let fetchPosts = () => async dispatch => {
   let response = await jsonPlaceHolder.get("/posts");
   dispatch({ type: "FETCH_POSTS", payload: response.data });
 };
+// (179)add action to fetch 1 user at time
+export const fetchUser = id => async dispatch => {
+  let response = await jsonPlaceHolder.get(`/users/${id}`);
+  dispatch({ type: "FETCH_USER", payload: response.data });
+};

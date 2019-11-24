@@ -2,6 +2,7 @@ import React from "react";
 //run action fetchPosts any time our component is mounted on the screen
 import { connect } from "react-redux";
 import { fetchPosts } from "../actions";
+import UserHeader from "./UserHeader";
 
 // use class component tu use componentdidmount for fetching data
 /*1.state пустой
@@ -16,6 +17,7 @@ class PostList extends React.Component {
     this.props.fetchPosts(); //return type: 'FETCH_POSTS'
   }
 
+  //posts получено из mapStateToProps >> reducers
   renderList() {
     return this.props.posts.map(post => {
       return (
@@ -25,6 +27,11 @@ class PostList extends React.Component {
             <div className="description">
               <h2>{post.title}</h2>
               <p> {post.body} </p>
+            </div>
+            {/*(180) http://jsonplaceholder.typicode.com/posts передадим как prop userId,
+            которое находится в инфе каждого post */}
+            <div>
+              <UserHeader userId={post.userId} />
             </div>
           </div>
         </div>

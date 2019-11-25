@@ -1,3 +1,4 @@
+import _ from "lodash";
 import jsonPlaceHolder from "../apis/jsonPlaceHolder";
 
 /*(162) bad approach! breaking rules of the action creator. actions must be plain objects.
@@ -27,8 +28,51 @@ export let fetchPosts = () => async dispatch => {
   let response = await jsonPlaceHolder.get("/posts");
   dispatch({ type: "FETCH_POSTS", payload: response.data });
 };
-// (179)add action to fetch 1 user at time
+/*// (179)add action to fetch 1 user at time
+рефакторинг memoize в 186 */
 export const fetchUser = id => async dispatch => {
   let response = await jsonPlaceHolder.get(`/users/${id}`);
   dispatch({ type: "FETCH_USER", payload: response.data });
+};
+
+/*(184,185) memoize не будет работать, потому что  function(dispatch) все равно будет 
+запускаться каждый раз с помощью redux thunk, т.к. была передана функция, а не объект.
+не прокатит делать memoize function dispatch, т.к. fetchUser каждый раз создает
+новую функцию с аргументом id, и memoize тоже каждый раз создается заново  
+export const fetchUser = _.memoize(function(id) {
+  return async function(dispatch) {
+    let response = await jsonPlaceHolder.get(`/users/${id}`);
+    dispatch({ type: "FETCH_USER", payload: response.data });
+  };
+});
+*/
+/*(186) сделаем правильный рфакторинг, использую memoize
+export const fetchUser = id => dispatch => _fetchUser(id, dispatch);
+
+let _fetchUser = _.memoize(async (id, dispatch) => {
+  let response = await jsonPlaceHolder.get(`/users/${id}`);
+  dispatch({ type: "FETCH_USER", payload: response.data });
+});
+*/
+
+/*(187) 2d way get list of posts and iterate over unique users id, fetch them.
+(188) в action обращаемся к функции, поэтому нужно добавить dispatch к fetchPosts.
+требуется await fetchPosts, чтобы убедиться, что посты загружены, прежде чем 
+итерировать User id.
+getState - get access to the redux store */
+export const fetchPostsAndUsers = id => async (dispatch, getState) => {
+  //console.log("about to fetch posts");
+  await dispatch(fetchPosts());
+  /*(190) replace with _.chain()
+  const userIds = _.uniq(_.map(getState().posts, "userId"));
+  userIds.forEach(id => dispatch(fetchUser(id))); */
+
+  _.chain(getState().posts)
+    .map("userId")
+    .uniq()
+    .forEach(id => dispatch(fetchUser(id)))
+    .value(); //value - execute
+  //console.log(userIds);
+  //console.log("fetched posts");
+  //console.log(getState().posts);
 };

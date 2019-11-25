@@ -1,7 +1,8 @@
 import React from "react";
 //run action fetchPosts any time our component is mounted on the screen
 import { connect } from "react-redux";
-import { fetchPosts } from "../actions";
+// (188) removed import fetchPosts
+import { fetchPostsAndUsers } from "../actions";
 import UserHeader from "./UserHeader";
 
 // use class component tu use componentdidmount for fetching data
@@ -13,8 +14,10 @@ reducer видит, что это FETCH_POSTS и возвращает payload.
 */
 class PostList extends React.Component {
   componentDidMount() {
-    //console.log(this.props.fetchPosts());
-    this.props.fetchPosts(); //return type: 'FETCH_POSTS'
+    /*console.log(this.props.fetchPosts());
+    this.props.fetchPosts(); //return type: 'FETCH_POSTS' */
+    /*(188) заменим на fetchPostsAndUsers */
+    this.props.fetchPostsAndUsers();
   }
 
   //posts получено из mapStateToProps >> reducers
@@ -60,4 +63,4 @@ let mapStateToProps = state => {
 export default connect(null, { fetchPosts })(PostList);
 */
 // add mapStatToProps
-export default connect(mapStateToProps, { fetchPosts })(PostList);
+export default connect(mapStateToProps, { fetchPostsAndUsers })(PostList);
